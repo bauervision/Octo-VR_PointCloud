@@ -5,6 +5,8 @@ public class InteractionsManager : MonoBehaviour
     public GameObject pavers;
     public GameObject roof;
     public GameObject signs;
+    public GameObject trunk;
+    public GameObject flood;
 
 
 
@@ -26,5 +28,15 @@ public class InteractionsManager : MonoBehaviour
     public void Toggle_Signs()
     {
         signs.SetActive(!signs.activeInHierarchy);
+    }
+
+    public void Toggle_Trunk()
+    {
+        trunk.SetActive(!trunk.activeInHierarchy);
+    }
+
+    public void SetFlood(float value)
+    {
+        flood.transform.position = new Vector3(flood.transform.position.x, value, flood.transform.position.z);
     }
 }
