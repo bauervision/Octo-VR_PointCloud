@@ -28,10 +28,6 @@ public class SelectionZone : MonoBehaviour
         shader.SetFloat("_Radius", SelectionRadius);
     }
 
-    // private void handleColorUpdate()
-    // {
-    //     shader.SetColor("_Tint", SelectionColor);
-    // }
 
     public void SetMeshVector(Vector3 value)
     {
@@ -43,7 +39,7 @@ public class SelectionZone : MonoBehaviour
     {
         handleShaderUpdate();
         handleRadiusUpdate();
-        //handleColorUpdate();
+
         SetMeshVector(this.transform.position);
     }
 }
