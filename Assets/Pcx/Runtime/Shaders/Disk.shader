@@ -7,6 +7,8 @@ Shader "Point Cloud/Disk"
     {
         _Tint("Tint", Color) = (0.5, 0.5, 0.5, 1)
         _PointSize("Point Size", Float) = 0.05
+        _ForceField ("Force Field Position", Vector) = (0, 0, 0)
+        _Radius("Radius", Float) = 0.5
     }
     SubShader
     {

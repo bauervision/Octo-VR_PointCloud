@@ -8,6 +8,8 @@
 half4 _Tint;
 half _PointSize;
 float4x4 _Transform;
+uniform float4 _ForceField;
+uniform float _Radius;
 
 #if _COMPUTE_BUFFER
 StructuredBuffer<float4> _PointBuffer;
@@ -20,7 +22,9 @@ struct Attributes
     uint vertexID : SV_VertexID;
 #else
     float4 position : POSITION;
-    half3 color : COLOR;
+    half4 color : COLOR;
+    float4 worldPos : TEXCOORD0;
+
 #endif
 };
 
@@ -29,8 +33,10 @@ struct Varyings
 {
     float4 position : SV_POSITION;
 #if !PCX_SHADOW_CASTER
-    half3 color : COLOR;
+    half4 color : COLOR;
     UNITY_FOG_COORDS(0)
+    float4 worldPos : TEXCOORD0;
+
 #endif
 };
 
@@ -41,21 +47,21 @@ Varyings Vertex(Attributes input)
 #if _COMPUTE_BUFFER
     float4 pt = _PointBuffer[input.vertexID];
     float4 pos = mul(_Transform, float4(pt.xyz, 1));
-    half3 col = PcxDecodeColor(asuint(pt.w));
+    half4 col = PcxDecodeColor(asuint(pt.w));
 #else
     float4 pos = input.position;
-    half3 col = input.color;
+    half4 col = input.color;
 #endif
 
-#if !PCX_SHADOW_CASTER
-    // Color space convertion & applying tint
-    #if UNITY_COLORSPACE_GAMMA
-        col *= _Tint.rgb * 2;
-    #else
-        col *= LinearToGammaSpace(_Tint.rgb) * 2;
-        col = GammaToLinearSpace(col);
-    #endif
-#endif
+// #if !PCX_SHADOW_CASTER
+//     // Color space convertion & applying tint
+//     #if UNITY_COLORSPACE_GAMMA
+//         col *= _Tint.rgb * 2;
+//     #else
+//         col *= LinearToGammaSpace(_Tint.rgb) * 2;
+//         col = GammaToLinearSpace(col);
+//     #endif
+// #endif
 
     // Set vertex output.
     Varyings o;
@@ -118,9 +124,12 @@ half4 Fragment(Varyings input) : SV_Target
 #if PCX_SHADOW_CASTER
     return 0;
 #else
-    half4 c = half4(input.color, _Tint.a);
+    half4 color = input.color;
     UNITY_APPLY_FOG(input.fogCoord, c);
-    return c;
+    if (distance (input.worldPos, _ForceField) < _Radius){
+        color *= _Tint.rgba * 2;
+    }
+    return color;
 #endif
 }
 
